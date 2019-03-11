@@ -22,24 +22,16 @@ job_definitions:
       - run: make
 
 jobs:
-  build-branch:
+  go:
     <<: *defaults
     <<: *build_steps
-
-workflow_definitions:
-  branch_common: &branch_common
-    context: raywalker-it-common
-    filters:
-      branches:
-        only: /.*/
 
 workflows:
   version: 2
   branch:
     jobs:
-      - build-branch:
-          <<: *branch_common
-      - deploy-develop:
-          <<: *branch_common
-          requires:
-            - build-branch
+      - go:
+          context: raywalker-it-common
+          filters:
+            branches:
+              only: /.*/
