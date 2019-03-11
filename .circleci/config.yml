@@ -1,0 +1,49 @@
+---
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: gcr.io/cedar-hawk-222400/deployer:develop
+  environment:
+    APP_HOSTNAME: example.raywalker.it
+    CONTAINER_PREFIX: example
+    WP_DB_PREFIX: fnord_
+    SOURCE_BUCKET: www.raywalker.it
+
+job_definitions:
+  build_steps: &build_steps
+    working_directory: ~/
+    steps:
+      - setup_remote_docker
+      - run: activate-gcloud-account.sh
+      - run: mkdir -p /tmp/workspace/var
+      - run: mkdir -p /tmp/workspace/src
+      - run: echo "${CIRCLE_BUILD_NUM}" > /tmp/workspace/var/circle-build-num
+      - run: make
+      - run:
+          name: Notify failure
+          when: on_fail
+          command: TYPE="Build" notify-job-failure.sh
+
+jobs:
+  build-branch:
+    <<: *defaults
+    <<: *build_steps
+
+workflow_definitions:
+  develop_common: &develop_common
+    context: org-global
+    filters:
+      branches:
+        only: develop
+
+workflows:
+  version: 2
+  branch:
+    jobs:
+      - build-branch:
+          <<: *develop_common
+      - deploy-develop:
+          <<: *develop_common
+          requires:
+            - build-branch
