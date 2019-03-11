@@ -7,8 +7,8 @@ defaults: &defaults
   environment:
     APP_HOSTNAME: example.raywalker.it
     CONTAINER_PREFIX: example
-    WP_DB_PREFIX: fnord_
     SOURCE_BUCKET: www.raywalker.it
+    WP_DB_PREFIX: fnord_
 
 job_definitions:
   build_steps: &build_steps
