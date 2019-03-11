@@ -31,19 +31,19 @@ jobs:
     <<: *build_steps
 
 workflow_definitions:
-  develop_common: &develop_common
-    context: org-global
+  branch_common: &branch_common
+    context: raywalker-it-common
     filters:
       branches:
-        only: develop
+        only: /.*/
 
 workflows:
   version: 2
   branch:
     jobs:
       - build-branch:
-          <<: *develop_common
+          <<: *branch_common
       - deploy-develop:
-          <<: *develop_common
+          <<: *branch_common
           requires:
             - build-branch
